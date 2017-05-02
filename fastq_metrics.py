@@ -25,12 +25,27 @@ def fastq_metrics(read_list):
         temp_number_reads_fw = []
         temp_number_reads_rv = []
 
+        temp_number_read_without_NNN_fw = []
+        temp_number_read_without_NNN_rv = []
+
         for rec1, rec2 in izip_longest(readiter_fw, readiter_rv):
             # Obtain the list of ids and count them (lectures number)
             temp_number_reads_fw.append([rec1.id])
             temp_number_reads_rv.append([rec2.id])
 
-        number_pair_reads.append([len(temp_number_reads_fw), len(temp_number_reads_rv)])
+            if rec1.seq.startswith("N"):
+                pass
+            else:
+                temp_number_read_without_NNN_fw.append([rec1.id])
+
+            if rec2.seq.startswith("N"):
+                pass
+            else:
+                temp_number_read_without_NNN_rv.append([rec2.id])
+
+        number_pair_reads.append([len(temp_number_reads_fw), len(temp_number_reads_rv),
+                                  len(temp_number_read_without_NNN_fw), len(temp_number_read_without_NNN_rv)])
+
 
     return number_pair_reads
 
@@ -46,14 +61,14 @@ def calculate_fastq_metrics(input_fastq):
 
     fastq_statistics = open(fastq_statistics_filename, "w")
 
-    fastq_statistics.write("#Reads_FW\t#Reads_RV\n")
+    fastq_statistics.write("#Reads_FW\t#Reads_RV\t#Reads_filterN_FW\t#Reads_filterN_RV\n")
 
     input_fastq_list = fastq_reader(input_fastq)
 
     number_reads_list = fastq_metrics(input_fastq_list)
 
     for n_reads in number_reads_list:
-        numbers_reads = str(n_reads[0]) + "\t" + str(n_reads[1]) + "\n"
+        numbers_reads = str(n_reads[0]) + "\t" + str(n_reads[1]) + "\t" + str(n_reads[2]) + "\t" + str(n_reads[3]) + "\n"
         fastq_statistics.write(numbers_reads)
 
 def main():
